@@ -306,9 +306,12 @@ public class Main {
 
 		return route;
 	}
+	
 	public static void main(String args[]) {
+		
 		HashSet<String> validStations = new HashSet<>();
 		HashMap<String, ArrayList<Connection>> graph = new HashMap<>();
+		
 		/*This references the file I put into the java project directory*/
 		File MetroLinkFile = new File("Metrolink_times_linecolour.csv");
 		String currentLineColour = "";
@@ -322,19 +325,15 @@ public class Main {
 				if (data.toLowerCase().startsWith("from")) {
 					continue;
 				}
-				// if (!data.contains(",")) {
-				// currentLineColour = data.toLowerCase();
-				// System.out.println("Current line colour: " + currentLineColour);
-				// continue;
-				// }
-				/*I split each character read if there is a comma and put into an array and i created a for loop to read the array data*/
-				// String[] dataparts = data.split(",");
+				
 				String[] dataparts = data.split(",");
+				
 				if (dataparts.length == 1 || dataparts[1].trim().isEmpty()) {
 					currentLineColour = dataparts[0].trim().toLowerCase();
-					System.out.println("Current line colour: " + currentLineColour);
+//					System.out.println("Current line colour: " + currentLineColour);
 					continue;
 				}
+				
 				if (dataparts.length >= 3) {
 					String fromStation = dataparts[0].trim().toLowerCase();
 					String toStation = dataparts[1].trim().toLowerCase();
@@ -344,10 +343,11 @@ public class Main {
 					if (!graph.containsKey(fromStation)) {
 						graph.put(fromStation, new ArrayList<Connection>());
 					}
+					
 					if (!graph.containsKey(toStation)) {
 						graph.put(toStation, new ArrayList<Connection>());
 					}
-					System.out.println("Adding: " + fromStation + " -> " + toStation + " on " + currentLineColour);
+//					System.out.println("Adding: " + fromStation + " -> " + toStation + " on " + currentLineColour);
 					graph.get(fromStation).add(new Connection(toStation, currentLineColour, time));
 					graph.get(toStation).add(new Connection(fromStation, currentLineColour, time));
 				}
@@ -357,82 +357,11 @@ public class Main {
 			e.printStackTrace();
 			return;
 		}
+		
 		System.out.println("Station loaded: " + validStations.size());
-		/*Creating a scanner to get userInput on both start and endStations*/
-		Scanner userInput = new Scanner(System.in);
-		String startingStation;
-		while (true) {
-			System.out.println("Enter starting station: ");
-			startingStation = userInput.nextLine().trim().toLowerCase();
-			if (validStations.contains(startingStation)) { /*This will break the while loop if it finds a valid station that matches the one in the csv file*/
-				break;
-			}
-			System.out.println("This station does not exist try again.");
-		}
-		String endingStation;
-		while(true) {
-			System.out.println("Enter the end station: ");
-			endingStation = userInput.nextLine().trim().toLowerCase();
-			if(validStations.contains(endingStation)) {
-				break;
-			}
-			System.out.println("This station does not exist try again.");
-		}
-		System.out.println("Start station: " + startingStation);
-		System.out.println("End Station: " + endingStation);
 		
-		// ArrayList<String> route = findRoute(graph, startingStation, endingStation);
-		// ArrayList<String> route = findShortestTimeRoute(graph, startingStation, endingStation);
+		new MetroGUI(graph);
 		
-		System.out.println("Enter route option: ");
-		System.out.println("1. Any existing route");
-		System.out.println("2. Shortest time to route");
-		System.out.println("3. Fewest changes route");
-		
-		int choice = Integer.parseInt(userInput.nextLine());
-		
-		ArrayList<String> route;
-		
-		if (choice == 1) {
-			
-			System.out.println("Route type: Any valid route");
-			route = findRoute(graph, startingStation, endingStation);
-			
-		} else if(choice == 2) {
-			
-			System.out.println("Route type: Shortest time route");
-			route = findShortestTimeRoute(graph, startingStation, endingStation);
-			
-		} else {
-			
-			System.out.println("Route type: Fewest changes route");
-			
-			ArrayList<RouteStep> stepRoute = findFewestChangesRoute(graph, startingStation, endingStation);
-			
-			if (stepRoute.isEmpty()) {
-				
-				System.out.println("Cannot find route");
-				
-			} else {
-				
-				System.out.println("\nFound route\n");
-				printRouteSteps(stepRoute);
-				
-			}
-			
-			userInput.close();
-			return;
-			
-//			route = findFewestChangesRoute(graph, startingStation, endingStation);
-		}
-		
-		if (route.isEmpty()) {
-			System.out.println("No route found.");
-		} else {
-			System.out.println("\nRoute found:\n");
-			printRouteWithDetails(graph, route);
-
-		}
-		userInput.close();
 	}
 }
+		
